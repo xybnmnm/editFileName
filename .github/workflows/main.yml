@@ -20,57 +20,20 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        shell: pwsh
+        shell: cmd
         run: |
           python -m pip install --upgrade pip  
-          if (Test-Path requirements.txt) {  
+          if exist requirements.txt (  
             python -m pip install -r requirements.txt  
-          } else {  
-            Write-Output "No requirements.txt found, skipping"  
-          }  
+          ) else (  
+            echo No requirements.txt found, skipping  
+          )  
 
       - name: Install PyInstaller
-        shell: pwsh
+        shell: cmd
         run: |
           python -m pip install --upgrade pyinstaller  
 
       - name: Build executable
-        shell: pwsh
+        shell: cmd
         run: |
-          # 根据你的项目实际情况修改命令  
-          # 示例：打包 batch_rename.py，若有数据需要 add-data，请按下面的示例添加  
-          pyinstaller --onefile --clean batch_rename.py  
-          # 如需添加数据，示例：  
-          # pyinstaller --onefile --clean --add-data "C:\path\data;data" batch_rename.py  
-
-      - name: List artifacts
-        shell: pwsh
-        run: dir dist
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: dist/*.exe
-
-      - name: Create Release (optional)
-        if: github.event_name == 'push'
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref_name }}
-          release_name: Release ${{ github.ref_name }}
-          draft: false
-          prerelease: false
-
-      - name: Upload to Release (optional)
-        if: github.event_name == 'push'
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dist/*.exe
-          asset_name: batch_rename.exe
-          asset_label: 'Windows executable'
