@@ -39,11 +39,17 @@ jobs:
         run: |
           pyinstaller --onefile --clean --icon icons/app_icon.ico batch_rename.py  
 
-      - name: Rename output to 批量修改文件名.exe
-        shell: cmd
+      - name: List dist contents (debug)
+        shell: pwsh
         run: |
-          if exist dist (\   
-            ren dist\batch_rename.exe "批量修改文件名.exe" \
-          ) else (  
-            echo "dist/batch_rename.exe not found"  
-          )
+          if (Test-Path dist) {  
+            Get-ChildItem -Recurse dist | Select-Object FullName, Length | Format-Table -AutoSize  
+          } else {  
+            Write-Output "dist directory not found"  
+          }  
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/批量修改文件名.exe
