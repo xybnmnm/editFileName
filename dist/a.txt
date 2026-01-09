@@ -1,0 +1,19 @@
+      - name: Build executable
+        shell: cmd
+        run: |
+          pyinstaller --onefile --clean --icon icons/app_icon.ico batch_rename.py
+
+      - name: List dist contents (debug)
+        shell: pwsh
+        run: |
+          if (Test-Path dist) {
+            Get-ChildItem -Recurse dist | Select-Object FullName, Length | Format-Table -AutoSize
+          } else {
+            Write-Output "dist directory not found"
+          }
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/**/*.exe
